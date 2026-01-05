@@ -1,0 +1,308 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////
+// ENUMS
+//////////////////////////
+
+enum MediaPurpose {
+  ISSUE_REPORTED
+  ADMIN_PROOF
+  USER_VERIFICATION
+}   
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+//////////////////////////
+// USERS & ACCESS CONTROL
+//////////////////////////
+
+model User {
+  id              String      @id @default(uuid())
+  fullName        String
+  email           String?     @unique
+  phoneNumber     String?     @unique
+  passwordHash    String
+  profilePhotoUrl String?
+  bio             String?
+  isVerified      Boolean     @default(false)
+  isActive        Boolean     @default(true)
+
+  cityId          String
+  zoneId          String
+  localityId      String
+
+  city            City        @relation(fields: [cityId], references: [id])
+  zone            Zone        @relation(fields: [zoneId], references: [id])
+  locality        Locality    @relation(fields: [localityId], references: [id])
+
+  roles           UserRole[]
+  issues          Issue[]
+  comments        Comment[]
+  upvotes         IssueUpvote[]
+  mediaUploads    Media[]
+  adminProfile    AdminProfile?
+  statusLogs      IssueStatusLog[]
+  verifications   IssueVerification[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Role {
+  id    String     @id @default(uuid())
+  name  String     @unique
+
+  users UserRole[]
+}
+
+model UserRole {
+  userId String
+  roleId String
+
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+}
+
+//////////////////////////
+// GEOGRAPHY
+//////////////////////////
+
+model City {
+  id     String  @id @default(uuid())
+  name   String
+  state  String
+
+  zones  Zone[]
+  users  User[]
+}
+
+model Zone {
+  id      String   @id @default(uuid())
+  name    String
+  cityId  String
+
+  city        City        @relation(fields: [cityId], references: [id])
+  localities  Locality[]
+  users       User[]
+}
+
+model Locality {
+  id        String   @id @default(uuid())
+  name      String
+  latitude  Float
+  longitude Float
+  zoneId    String
+
+  zone        Zone         @relation(fields: [zoneId], references: [id])
+  users       User[]
+  issues      Issue[]
+  adminLinks  AdminLocality[]
+}   
+
+//////////////////////////
+// ISSUE CLASSIFICATION
+//////////////////////////
+
+model Department {
+  id         String          @id @default(uuid())
+  name       String          @unique
+
+  categories IssueCategory[]
+  admins     AdminDepartment[]
+  issues     Issue[]
+}
+
+model IssueCategory {
+  id            String       @id @default(uuid())
+  name          String
+  departmentId  String
+
+  department    Department  @relation(fields: [departmentId], references: [id])
+  issues        Issue[]
+  slaRules      SlaRule[]
+}
+
+//////////////////////////
+// CORE ISSUE SYSTEM
+//////////////////////////
+
+model Issue {
+  id              String      @id @default(uuid())
+  title           String
+  description     String
+
+  userId          String
+  categoryId      String
+  departmentId    String
+  localityId      String
+  statusId        String
+  currentAdminId  String?
+
+  slaDeadline     DateTime
+
+  user            User        @relation(fields: [userId], references: [id])
+  category        IssueCategory @relation(fields: [categoryId], references: [id])
+  department      Department  @relation(fields: [departmentId], references: [id])
+  locality        Locality    @relation(fields: [localityId], references: [id])
+  status          IssueStatus @relation(fields: [statusId], references: [id])
+
+  comments        Comment[]
+  upvotes         IssueUpvote[]
+  mediaLinks      IssueMedia[]
+  statusLogs      IssueStatusLog[]
+  verification    IssueVerification?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model IssueStatus {
+  id    String   @id @default(uuid())
+  name  String   @unique
+
+  issues Issue[]
+  logs   IssueStatusLog[]
+}
+
+model IssueStatusLog {
+  id              String   @id @default(uuid())
+  issueId         String
+  statusId        String
+  changedByUserId String
+  remarks         String?
+
+  issue           Issue       @relation(fields: [issueId], references: [id])
+  status          IssueStatus @relation(fields: [statusId], references: [id])
+  changedBy       User        @relation(fields: [changedByUserId], references: [id])
+
+  createdAt       DateTime    @default(now())
+}
+
+//////////////////////////
+// MEDIA SYSTEM
+//////////////////////////
+
+model Media {
+  id              String     @id @default(uuid())
+  uploaderUserId  String
+  mediaType       MediaType
+  fileUrl         String
+  thumbnailUrl    String?
+
+  uploader        User       @relation(fields: [uploaderUserId], references: [id])
+  issues          IssueMedia[]
+
+  createdAt       DateTime   @default(now())
+}
+
+model IssueMedia {
+  issueId   String
+  mediaId   String
+  purpose   MediaPurpose
+
+  issue     Issue  @relation(fields: [issueId], references: [id])
+  media     Media  @relation(fields: [mediaId], references: [id])
+
+  @@id([issueId, mediaId])
+}
+
+//////////////////////////
+// SOCIAL FEATURES
+//////////////////////////
+
+model Comment {
+  id        String   @id @default(uuid())
+  issueId   String
+  userId    String
+  content   String
+
+  issue     Issue   @relation(fields: [issueId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model IssueUpvote {
+  issueId String
+  userId  String
+
+  issue   Issue @relation(fields: [issueId], references: [id])
+  user    User  @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@id([issueId, userId])
+}
+
+//////////////////////////
+// ADMIN SYSTEM
+//////////////////////////
+
+model AdminProfile {
+  userId     String  @id
+  adminLevel Int
+
+  user        User            @relation(fields: [userId], references: [id])
+  departments AdminDepartment[]
+  localities  AdminLocality[]
+}
+
+model AdminDepartment {
+  adminUserId  String
+  departmentId String
+
+  admin       AdminProfile @relation(fields: [adminUserId], references: [userId])
+  department  Department   @relation(fields: [departmentId], references: [id])
+
+  @@id([adminUserId, departmentId])
+}
+
+model AdminLocality {
+  adminUserId String
+  localityId  String
+
+  admin      AdminProfile @relation(fields: [adminUserId], references: [userId])
+  locality   Locality     @relation(fields: [localityId], references: [id])
+
+  @@id([adminUserId, localityId])
+}
+
+//////////////////////////
+// SLA & ESCALATION
+//////////////////////////
+
+model SlaRule {
+  id           String @id @default(uuid())
+  categoryId   String
+  adminLevel   Int
+  timeLimitHours Int
+
+  category     IssueCategory @relation(fields: [categoryId], references: [id])
+}
+
+//////////////////////////
+// VERIFICATION
+//////////////////////////
+
+model IssueVerification {
+  id        String   @id @default(uuid())
+  issueId   String   @unique
+  userId    String
+  feedback  String?
+  verifiedAt DateTime
+
+  issue     Issue   @relation(fields: [issueId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+}
