@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import { ENV } from "./config/env.js";
+import cors from "cors";
 
 // routes
 import authRoutes from "./routes/auth.route.js";
