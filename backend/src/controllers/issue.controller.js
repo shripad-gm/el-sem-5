@@ -194,6 +194,7 @@ export const getUniversalFeed = async (req, res) => {
     user: {
       select: {
         id: true,
+        email: true,
         fullName: true,
         profilePhotoUrl: true
       }
@@ -232,6 +233,7 @@ export const getUniversalFeed = async (req, res) => {
 
   postedBy: {
     id: issue.user.id,
+    email: issue.user.email,
     name: issue.user.fullName,
     avatar: issue.user.profilePhotoUrl
   },
