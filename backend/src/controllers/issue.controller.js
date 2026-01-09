@@ -176,59 +176,77 @@ export const getUniversalFeed = async (req, res) => {
     const user = req.user;
 
     const issues = await prisma.issue.findMany({
-      where: {
-        locality: {
-          zone: {
-            cityId: user.cityId
-          }
-        }
-      },
-      orderBy: {
-        createdAt: "desc"
-      },
+  where: {
+    locality: {
+      zone: {
+        cityId: user.cityId
+      }
+    }
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  select: {
+    id: true,
+    title: true,
+    createdAt: true,
+
+    user: {
       select: {
         id: true,
-        title: true,
-        createdAt: true,
+        fullName: true,
+        profilePhotoUrl: true
+      }
+    },
 
-        status: {
-          select: { name: true }
-        },
+    status: {
+      select: { name: true }
+    },
 
-        category: {
-          select: { name: true }
-        },
+    category: {
+      select: { name: true }
+    },
 
-        locality: {
-          select: { name: true }
-        },
+    locality: {
+      select: { name: true }
+    },
 
-        mediaLinks: {
-          where: { purpose: "ISSUE_REPORTED" },
+    mediaLinks: {
+      where: { purpose: "ISSUE_REPORTED" },
+      select: {
+        media: {
           select: {
-            media: {
-              select: {
-                mediaType: true,
-                fileUrl: true
-              }
-            }
+            mediaType: true,
+            fileUrl: true
           }
         }
       }
-    });
+    }
+  }
+});
+
 
     const response = issues.map(issue => ({
-      id: issue.id,
-      title: issue.title,
-      status: issue.status.name,
-      category: issue.category.name,
-      locality: issue.locality.name,
-      createdAt: issue.createdAt,
-      media: issue.mediaLinks.map(m => ({
-        type: m.media.mediaType,
-        url: m.media.fileUrl
-      }))
-    }));
+  id: issue.id,
+  title: issue.title,
+
+  postedBy: {
+    id: issue.user.id,
+    name: issue.user.fullName,
+    avatar: issue.user.profilePhotoUrl
+  },
+
+  status: issue.status.name,
+  category: issue.category.name,
+  locality: issue.locality.name,
+  createdAt: issue.createdAt,
+
+  media: issue.mediaLinks.map(m => ({
+    type: m.media.mediaType,
+    url: m.media.fileUrl
+  }))
+}));
+
 
     res.json(response);
 
