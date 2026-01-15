@@ -264,6 +264,16 @@ export const toggleUpvote = async (req, res) => {
     const { issueId } = req.params;
     const userId = req.user.id;
 
+    const issue = await prisma.issue.findUnique({
+      where: { id: issueId },
+      select: { id: true },
+    });
+
+    if (!issue) {
+      return res.status(404).json({
+        message: "Issue does not exist",
+      });
+    }
     const existing = await prisma.issueUpvote.findUnique({
       where: {
         issueId_userId: {
@@ -306,8 +316,20 @@ export const addComment = async (req, res) => {
     const { content } = req.body;
     const userId = req.user.id;
 
-    if (!content) {
+    if (!content || content.trim() === "") {
       return res.status(400).json({ message: "Comment content required" });
+    }
+
+    // 🔥 CRITICAL CHECK (missing before)
+    const issue = await prisma.issue.findUnique({
+      where: { id: issueId },
+      select: { id: true },
+    });
+
+    if (!issue) {
+      return res.status(404).json({
+        message: "Issue does not exist",
+      });
     }
 
     const comment = await prisma.comment.create({
