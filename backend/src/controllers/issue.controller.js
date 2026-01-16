@@ -113,6 +113,15 @@ export const getCitizenFeed = async (req, res) => {
         description: true,
         createdAt: true,
 
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            profilePhotoUrl: true,
+          },
+        },
+
         status: {
           select: { name: true },
         },
@@ -154,12 +163,22 @@ export const getCitizenFeed = async (req, res) => {
       id: issue.id,
       title: issue.title,
       description: issue.description,
+
+      postedBy: {
+        id: issue.user.id,
+        name: issue.user.fullName,
+        email: issue.user.email,
+        avatar: issue.user.profilePhotoUrl,
+      },
+
       status: issue.status.name,
       category: issue.category.name,
       department: issue.department.name,
       createdAt: issue.createdAt,
+
       upvotes: issue._count.upvotes,
       comments: issue._count.comments,
+
       media: issue.mediaLinks.map((m) => ({
         id: m.media.id,
         type: m.media.mediaType,
@@ -174,6 +193,7 @@ export const getCitizenFeed = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch issue feed" });
   }
 };
+
 
 export const getUniversalFeed = async (req, res) => {
   try {
@@ -320,7 +340,6 @@ export const addComment = async (req, res) => {
       return res.status(400).json({ message: "Comment content required" });
     }
 
-    // 🔥 CRITICAL CHECK (missing before)
     const issue = await prisma.issue.findUnique({
       where: { id: issueId },
       select: { id: true },
