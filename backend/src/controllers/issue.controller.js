@@ -134,6 +134,10 @@ export const getCitizenFeed = async (req, res) => {
           select: { name: true },
         },
 
+        locality: {                     // ✅ ADDED
+          select: { name: true },
+        },
+
         _count: {
           select: {
             upvotes: true,
@@ -174,6 +178,7 @@ export const getCitizenFeed = async (req, res) => {
       status: issue.status.name,
       category: issue.category.name,
       department: issue.department.name,
+      locality: issue.locality.name,    // ✅ ADDED
       createdAt: issue.createdAt,
 
       upvotes: issue._count.upvotes,
@@ -194,7 +199,6 @@ export const getCitizenFeed = async (req, res) => {
   }
 };
 
-
 export const getUniversalFeed = async (req, res) => {
   try {
     const user = req.user;
@@ -213,6 +217,7 @@ export const getUniversalFeed = async (req, res) => {
       select: {
         id: true,
         title: true,
+        description: true,          
         createdAt: true,
 
         user: {
@@ -232,8 +237,19 @@ export const getUniversalFeed = async (req, res) => {
           select: { name: true },
         },
 
+        department: {               
+          select: { name: true },
+        },
+
         locality: {
           select: { name: true },
+        },
+
+        _count: {                   
+          select: {
+            upvotes: true,
+            comments: true,
+          },
         },
 
         mediaLinks: {
@@ -253,6 +269,7 @@ export const getUniversalFeed = async (req, res) => {
     const response = issues.map((issue) => ({
       id: issue.id,
       title: issue.title,
+      description: issue.description,   
 
       postedBy: {
         id: issue.user.id,
@@ -263,8 +280,12 @@ export const getUniversalFeed = async (req, res) => {
 
       status: issue.status.name,
       category: issue.category.name,
+      department: issue.department.name, 
       locality: issue.locality.name,
       createdAt: issue.createdAt,
+
+      upvotes: issue._count.upvotes,     
+      comments: issue._count.comments,   
 
       media: issue.mediaLinks.map((m) => ({
         type: m.media.mediaType,
@@ -278,6 +299,7 @@ export const getUniversalFeed = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch issues" });
   }
 };
+
 
 export const toggleUpvote = async (req, res) => {
   try {
