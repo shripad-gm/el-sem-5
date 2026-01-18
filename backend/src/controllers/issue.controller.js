@@ -178,7 +178,7 @@ export const getCitizenFeed = async (req, res) => {
       status: issue.status.name,
       category: issue.category.name,
       department: issue.department.name,
-      locality: issue.locality.name,    // ✅ ADDED
+      locality: issue.locality.name,    
       createdAt: issue.createdAt,
 
       upvotes: issue._count.upvotes,

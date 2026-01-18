@@ -73,11 +73,10 @@ export const login = async (req, res) => {
     if (phoneNumber) orConditions.push({ phoneNumber });
 
     const user = await prisma.user.findFirst({
-      where: {
-        OR: orConditions
-      },
+      where: { OR: orConditions },
       include: {
-        roles: { include: { role: true } }
+        roles: { include: { role: true } },
+        adminProfile: true
       }
     });
 
@@ -92,16 +91,22 @@ export const login = async (req, res) => {
 
     generateToken(user.id, res);
 
+    const roles = user.roles.map(r => r.role.name);
+    if (user.adminProfile) roles.push("admin");
+
     res.json({
       id: user.id,
       fullName: user.fullName,
-      roles: user.roles.map(r => r.role.name)
+      roles: [...new Set(roles)],
+      isAdmin: !!user.adminProfile
     });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Login failed" });
   }
 };
+
 
 
 export const logout = (req, res) => {
