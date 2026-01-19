@@ -25,7 +25,7 @@ export const getMe = async (req, res) => {
         },
 
         adminProfile: {
-          select: { userId: true } // ✅ minimal check
+          select: { userId: true } 
         }
       }
     });

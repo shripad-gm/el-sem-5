@@ -124,3 +124,4 @@ export const logout = (req, res) => {
     res.status(500).json({ message: "Logout failed" });
   }
 };
+

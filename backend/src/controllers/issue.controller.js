@@ -147,9 +147,12 @@ export const getCitizenFeed = async (req, res) => {
 
         mediaLinks: {
           where: {
-            purpose: "ISSUE_REPORTED",
+            purpose: {
+                    in: ["ISSUE_REPORTED", "ADMIN_PROOF"]
+            },
           },
           select: {
+            purpose: true,
             media: {
               select: {
                 id: true,
@@ -189,6 +192,7 @@ export const getCitizenFeed = async (req, res) => {
         type: m.media.mediaType,
         url: m.media.fileUrl,
         thumbnail: m.media.thumbnailUrl,
+        purpose: m.purpose
       })),
     }));
 
@@ -253,8 +257,11 @@ export const getUniversalFeed = async (req, res) => {
         },
 
         mediaLinks: {
-          where: { purpose: "ISSUE_REPORTED" },
+          where: { purpose: {
+                in: ["ISSUE_REPORTED", "ADMIN_PROOF"]
+          } },
           select: {
+            purpose: true,
             media: {
               select: {
                 mediaType: true,
@@ -288,8 +295,11 @@ export const getUniversalFeed = async (req, res) => {
       comments: issue._count.comments,   
 
       media: issue.mediaLinks.map((m) => ({
+        id: m.media.id,
         type: m.media.mediaType,
         url: m.media.fileUrl,
+        thumbnail: m.media.thumbnailUrl,
+        purpose: m.purpose
       })),
     }));
 

@@ -1,4 +1,5 @@
 import prisma from "../config/db.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const getAdminFeed = async (req, res) => {
   try {
@@ -50,7 +51,9 @@ export const getAdminFeed = async (req, res) => {
         },
 
         mediaLinks: {
-          where: { purpose: "ISSUE_REPORTED" },
+          where: {
+            purpose: { in: ["ISSUE_REPORTED", "ADMIN_PROOF"] }
+        },
           select: {
             media: {
               select: {
@@ -178,5 +181,106 @@ export const updateIssueStatus = async (req, res) => {
   } catch (error) {
     console.error("Admin status update error:", error);
     res.status(500).json({ message: "Failed to update issue status" });
+  }
+};
+
+export const uploadIssueProof = async (req, res) => {
+  try {
+    const { issueId } = req.params;
+    const adminUser = req.user;
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Proof media is required"
+      });
+    }
+
+
+    const adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: adminUser.id },
+      include: {
+        departments: true,
+        localities: true
+      }
+    });
+
+    if (!adminProfile) {
+      return res.status(403).json({ message: "Admins only" });
+    }
+
+
+    const issue = await prisma.issue.findUnique({
+      where: { id: issueId },
+      include: { status: true }
+    });
+
+    if (!issue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+
+
+    const hasDeptAccess = adminProfile.departments.some(
+      d => d.departmentId === issue.departmentId
+    );
+
+    const hasLocalityAccess = adminProfile.localities.some(
+      l => l.localityId === issue.localityId
+    );
+
+    if (!hasDeptAccess || !hasLocalityAccess) {
+      return res.status(403).json({ message: "Issue not assigned to you" });
+    }
+
+    const allowedStatuses = ["IN_PROGRESS", "RESOLVED_PENDING_USER"];
+    if (!allowedStatuses.includes(issue.status.name)) {
+      return res.status(400).json({
+        message: "Cannot upload proof at this stage"
+      });
+    }
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: "civic-monitor/admin-proofs",
+          resource_type: "auto"
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(req.file.buffer);
+    });
+
+    await prisma.$transaction(async (tx) => {
+      const media = await tx.media.create({
+        data: {
+          uploaderUserId: adminUser.id,
+          mediaType:
+            uploadResult.resource_type === "video"
+              ? "VIDEO"
+              : "IMAGE",
+          fileUrl: uploadResult.secure_url, 
+          thumbnailUrl: uploadResult.thumbnail_url || null
+        }
+      });
+
+      await tx.issueMedia.create({
+        data: {
+          issueId,
+          mediaId: media.id,
+          purpose: "ADMIN_PROOF"
+        }
+      });
+    });
+
+    res.status(201).json({
+      message: "Issue resolution proof uploaded successfully"
+    });
+
+  } catch (error) {
+    console.error("Admin proof upload error:", error);
+    res.status(500).json({
+      message: "Failed to upload issue proof"
+    });
   }
 };
