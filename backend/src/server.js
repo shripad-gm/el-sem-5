@@ -15,6 +15,7 @@ import adminRoutes from "./routes/admin.route.js";
 const app = express();
 
 const allowedOrigins = [
+  "https://super-crumble-3d1a8f.netlify.app",
   "http://localhost:5173",
   "http://localhost:3000",
   "https://civic-monitor.vercel.app"

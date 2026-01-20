@@ -1,76 +1,130 @@
 import prisma from "../src/config/db.js";
-
+import bcrypt from "bcryptjs";
 
 
 async function main() {
- console.log("🌱 Seeding admin user...");
+  console.log("👮 Seeding locality admins...");
 
-  // 1️⃣ Find user (by email or id)
-  const user = await prisma.user.findUnique({
-    where: { email: "admin@test.com" }
+  const PASSWORD = "Admin@123";
+  const passwordHash = await bcrypt.hash(PASSWORD, 10);
+
+  // 1️⃣ Fetch required geo
+  const city = await prisma.city.findFirst({ where: { name: "Bangalore" } });
+  if (!city) throw new Error("City not found");
+
+  const zone = await prisma.zone.findFirst({
+    where: { name: "West Bangalore", cityId: city.id },
+  });
+  if (!zone) throw new Error("Zone not found");
+
+  const locality = await prisma.locality.findFirst({
+    where: { name: "Pattangere", zoneId: zone.id },
+  });
+  if (!locality) throw new Error("Locality not found");
+
+  // 2️⃣ Ensure ADMIN role exists
+  let adminRole = await prisma.role.findUnique({
+    where: { name: "ADMIN" },
   });
 
-  if (!user) {
-    throw new Error("Admin user not found");
+  if (!adminRole) {
+    adminRole = await prisma.role.create({
+      data: { name: "ADMIN" },
+    });
   }
 
-  // 2️⃣ Create admin profile
-  await prisma.adminProfile.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: {
-      userId: user.id,
-      adminLevel: 1
+  // 3️⃣ Departments to seed admins for
+  const departments = await prisma.department.findMany();
+
+  for (const dept of departments) {
+    const email = `${dept.name.toLowerCase().replace(/\s+/g, "")}.pattangere@admin.com`;
+
+    // 4️⃣ Create User if not exists
+    let user = await prisma.user.findFirst({ where: { email } });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          fullName: `${dept.name} Admin - Pattangere`,
+          email,
+          passwordHash,
+          cityId: city.id,
+          zoneId: zone.id,
+          localityId: locality.id,
+          isVerified: true,
+        },
+      });
+      console.log(`✅ User created: ${email}`);
     }
-  });
 
-  // 3️⃣ Fetch department + locality
-  const department = await prisma.department.findFirst({
-    where: { name: "BBMP" }
-  });
+    // 5️⃣ Assign ADMIN role
+    const roleExists = await prisma.userRole.findFirst({
+      where: { userId: user.id, roleId: adminRole.id },
+    });
 
-  const locality = await prisma.locality.findFirst();
+    if (!roleExists) {
+      await prisma.userRole.create({
+        data: { userId: user.id, roleId: adminRole.id },
+      });
+    }
 
-  if (!department || !locality) {
-    throw new Error("Department or locality missing");
+    // 6️⃣ Create AdminProfile
+    let adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!adminProfile) {
+      adminProfile = await prisma.adminProfile.create({
+        data: {
+          userId: user.id,
+          adminLevel: 1, // locality-level admin
+        },
+      });
+    }
+
+    // 7️⃣ Link admin to department
+    const deptLink = await prisma.adminDepartment.findFirst({
+      where: {
+        adminUserId: user.id,
+        departmentId: dept.id,
+      },
+    });
+
+    if (!deptLink) {
+      await prisma.adminDepartment.create({
+        data: {
+          adminUserId: user.id,
+          departmentId: dept.id,
+        },
+      });
+    }
+
+    // 8️⃣ Link admin to locality
+    const localityLink = await prisma.adminLocality.findFirst({
+      where: {
+        adminUserId: user.id,
+        localityId: locality.id,
+      },
+    });
+
+    if (!localityLink) {
+      await prisma.adminLocality.create({
+        data: {
+          adminUserId: user.id,
+          localityId: locality.id,
+        },
+      });
+    }
+
+    console.log(`👮 Admin ready for ${dept.name}`);
   }
 
-  // 4️⃣ Assign department
-  await prisma.adminDepartment.upsert({
-    where: {
-      adminUserId_departmentId: {
-        adminUserId: user.id,
-        departmentId: department.id
-      }
-    },
-    update: {},
-    create: {
-      adminUserId: user.id,
-      departmentId: department.id
-    }
-  });
-
-  // 5️⃣ Assign locality
-  await prisma.adminLocality.upsert({
-    where: {
-      adminUserId_localityId: {
-        adminUserId: user.id,
-        localityId: locality.id
-      }
-    },
-    update: {},
-    create: {
-      adminUserId: user.id,
-      localityId: locality.id
-    }
-  });
-
-  console.log("✅ Admin seeded successfully");
+  console.log("🎉 Locality admin seeding completed");
 }
 
 main()
-  .catch((error) => {
-    console.error("❌ SLA seed failed:", error);
+  .catch((e) => {
+    console.error("❌ Admin seed failed:", e);
     process.exit(1);
   })
   .finally(async () => {
