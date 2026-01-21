@@ -15,6 +15,7 @@ import adminRoutes from "./routes/admin.route.js";
 const app = express();
 
 const allowedOrigins = [
+  "https://civicsense-ai-32j8.onrender.com",
   "https://civic-sense-rvce.netlify.app",
   "https://super-crumble-3d1a8f.netlify.app",
   "http://localhost:5173",
