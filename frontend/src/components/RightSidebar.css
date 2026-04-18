@@ -1,0 +1,86 @@
+.right-sidebar {
+  width: 300px;
+  position: sticky;
+  top: 88px;
+  align-self: flex-start;
+}
+
+.right-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+
+  width: auto;
+  min-width: 200px;
+}
+
+.right-card-header {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Trending */
+
+.trending-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.trending-item {
+  display: flex;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.trending-rank {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.trending-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.trending-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.trending-muted {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* Ad */
+
+.ad-box {
+  padding: 8px 4px;
+}
+
+.ad-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.ad-text {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 10px;
+}
+
+.ad-cta {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #0a66c2;
+  color: white;
+}

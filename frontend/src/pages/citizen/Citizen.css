@@ -1,0 +1,54 @@
+.feed-container {
+  flex: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.feed-header {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 24px 0;
+  color: #1a1a1a;
+  padding: 8px 0;
+}
+
+.feed-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.page-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f9f9f9;
+  padding: 24px;
+  gap: 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .page-layout {
+    flex-direction: column;
+    padding: 16px;
+  }
+  
+  .feed-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+  .page-layout {
+    padding: 12px;
+  }
+  
+  .feed-header {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+}

@@ -1,0 +1,223 @@
+/* ROOT */
+.auth-root {
+  min-height: 100vh;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.auth-header {
+  height: 64px;
+  padding: 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0a66c2;
+}
+
+.auth-actions a {
+  margin-left: 16px;
+  font-size: 14px;
+  text-decoration: none;
+  color: #334155;
+}
+
+.auth-actions .primary {
+  background: #0a66c2;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 999px;
+}
+
+/* MAIN */
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 64px;
+}
+
+/* LEFT */
+.auth-left {
+  width: 420px;
+}
+
+.auth-left h1 {
+  font-size: 34px;
+  font-weight: 400;
+  color: #334155;
+  margin-bottom: 24px;
+}
+
+/* FORM */
+.auth-left form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-left input {
+  height: 44px;
+  padding: 0 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 14px;
+}
+
+.auth-left input:focus {
+  outline: none;
+  border-color: #0a66c2;
+}
+
+.auth-forgot {
+  font-size: 13px;
+  color: #0a66c2;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.auth-left button {
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-left button:not(.secondary) {
+  background: #0a66c2;
+  color: white;
+}
+
+.auth-left button.secondary {
+  background: white;
+  border: 1px solid #cbd5e1;
+}
+
+/* DIVIDER */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.auth-divider span {
+  margin: 0 12px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* RIGHT */
+.auth-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-right img {
+  max-width: 520px;
+}
+
+/* ERROR */
+.auth-error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .auth-main {
+    flex-direction: column;
+    padding: 24px;
+  }
+
+  .auth-right {
+    display: none;
+  }
+}
+.auth-subline {
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.auth-scroll {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+/* ---------- COMMON INPUT + SELECT BASE ---------- */
+
+.auth-left input,
+.auth-left select {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ---------- FOCUS STATE ---------- */
+
+.auth-left input:focus,
+.auth-left select:focus {
+  border-color: #0a66c2;
+  box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.15);
+}
+
+/* ---------- SELECT-SPECIFIC STYLING ---------- */
+
+.auth-left select {
+  appearance: none;              /* remove native arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%236b7280' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+  cursor: pointer;
+}
+
+/* ---------- PLACEHOLDER / DEFAULT OPTION ---------- */
+
+.auth-left select option[value=""] {
+  color: #9ca3af;
+}
+
+/* ---------- DISABLED SELECT (OPTIONAL) ---------- */
+
+.auth-left select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+/* ---------- MOBILE SAFETY ---------- */
+
+@media (max-width: 768px) {
+  .auth-left input,
+  .auth-left select {
+    font-size: 16px; /* prevents iOS zoom */
+  }
+}

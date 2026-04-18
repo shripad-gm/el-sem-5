@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { ENV } from "./config/env.js";
 import cors from "cors";
+import path from "path";
 
 // routes
 import authRoutes from "./routes/auth.route.js";
@@ -13,24 +14,17 @@ import adminRoutes from "./routes/admin.route.js";
 
 
 const app = express();
+const __dirname = path.resolve();
 
-const allowedOrigins = [
-  "https://civicsense-ai-32j8.onrender.com",
-  "https://civic-sense-rvce.netlify.app",
-  "https://super-crumble-3d1a8f.netlify.app",
-  "http://localhost:5173",
-  "http://localhost:3000",
-  "https://civic-monitor.vercel.app"
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true
-}));
+if (ENV.NODE_ENV !== "production") {
+  app.use(cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ],
+    credentials: true
+  }));
+}
 
 app.use(express.json());
 app.use(cookieParser());
@@ -43,13 +37,17 @@ app.use("/issues", issueCategoryRoutes);
 app.use("/issues", issueRoutes);
 app.use("/admin", adminRoutes);
 
+if (ENV.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-
-
-app.get("/", (req, res) => {
-  res.json({ status: "Civic Monitor API running " });
-});
-
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.json({ status: "Civic Monitor API running" });
+  });
+}
 
 app.listen(ENV.PORT, () => {
   console.log(`✅ Server running on port ${ENV.PORT}`);

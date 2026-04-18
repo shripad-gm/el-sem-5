@@ -1,0 +1,288 @@
+/* PAGE LAYOUT */
+.ci-page {
+  display: flex;
+  gap: 20px;
+  padding: 24px;
+  background: #f3f2ef;
+  justify-content: center;
+}
+
+.ci-container {
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+}
+
+/* PAGE HEADER WITH BACK BUTTON */
+.ci-page-header {
+  grid-column: 1 / -1;
+  margin-bottom: 8px;
+}
+
+.ci-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  width: fit-content;
+}
+
+.ci-back-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.ci-back-btn svg {
+  font-size: 16px;
+}
+
+/* MAIN ISSUE */
+.ci-main {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+}
+
+/* HEADER */
+.ci-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ci-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.ci-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+/* STATUS COLORS */
+.ci-open {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.ci-in_progress {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ci-resolved_pending_user {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.ci-closed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ci-rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* META */
+.ci-meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.ci-date {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* DESCRIPTION */
+.ci-description {
+  margin-top: 16px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #374151;
+}
+
+/* MEDIA */
+.ci-media {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.ci-media img,
+.ci-media video {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+/* NO MEDIA TAG */
+.ci-no-media {
+  margin-top: 12px;
+  display: inline-block;
+  padding: 6px 12px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+/* VERIFY SECTION */
+.ci-verify {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ci-verify h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ci-verify textarea {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.ci-verify button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #0a66c2;
+  color: #ffffff;
+  border-radius: 6px;
+}
+
+.ci-verify button:disabled {
+  opacity: 0.6;
+}
+
+/* SIDEBAR */
+.ci-sidebar {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  height: fit-content;
+}
+
+/* UPVOTES */
+.ci-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.ci-stat strong {
+  font-size: 18px;
+  color: #0a66c2;
+}
+
+/* COMMENTS */
+.ci-comments h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.ci-comment {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ci-comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.ci-comment-author {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ci-comment-text {
+  font-size: 13px;
+  color: #374151;
+}
+
+.ci-empty {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .ci-container {
+    grid-template-columns: 1fr;
+  }
+}
+.ci-verify-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ci-approve {
+  flex: 1;
+  background: #16a34a;
+  color: white;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.ci-reject {
+  flex: 1;
+  background: #dc2626;
+  color: white;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 6px;
+}
