@@ -1,17 +1,15 @@
-// src/api/axios.js
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.NODE_ENV === "development"
-    ? "http://localhost:5000"
-    : "/";
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5000/api"
+    : "/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // 🔑 cookie auth
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
-
 export default api;

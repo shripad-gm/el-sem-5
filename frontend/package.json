@@ -17,7 +17,6 @@
     "@headlessui/react": "^2.2.9",
     "@lottiefiles/dotlottie-react": "^0.17.13",
     "axios": "^1.13.2",
-    "el-sem-5": "file:..",
     "framer-motion": "^12.26.2",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.562.0",
